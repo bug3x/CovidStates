@@ -1,10 +1,11 @@
-import java.util.Map;
+import java.util.Map; 
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 public class Hash {
+
     public static void readFile() {
         File data = new File("covid417.csv");
         Map<String, Map<String, City>> states = new HashMap<>();
@@ -23,9 +24,13 @@ public class Hash {
                 String state = row[1];
                 String city = row[0];
 
-                City value = new City(row[0], row[1], 
-                                      Integer.parseInt(row[2]), Integer.parseInt(row[3]), 
-                                      Integer.parseInt(row[4]), Integer.parseInt(row[5]));
+                City value = new City(
+                    row[0], row[1], 
+                    Integer.parseInt(row[2]), 
+                    Integer.parseInt(row[3]), 
+                    Integer.parseInt(row[4]), 
+                    Integer.parseInt(row[5])
+                );
 
                 states.putIfAbsent(state, new HashMap<>());
                 states.get(state).put(city, value);
@@ -52,7 +57,16 @@ public class Hash {
 
             Map<String, City> cities = states.get(stateIn);
 
-            System.out.print("Input a city: ");
+            // Compute and display total metrics for the state
+            City totals = getStateTotals(cities);
+            System.out.println("\nState Totals for " + stateIn + ":");
+            System.out.println("  Total Cases: " + totals.getCases());
+            System.out.println("  Total Deaths: " + totals.getDeaths());
+            System.out.println("  Total Recovered: " + totals.getRecovered());
+            System.out.println("  Total Hospitalized: " + totals.getHospitalized());
+
+            // Prompt for city
+            System.out.print("\nInput a city: ");
             String cityIn = input.nextLine().trim();
 
             if (cities.containsKey(cityIn)) {
@@ -63,6 +77,23 @@ public class Hash {
             }
         }
         input.close();
+    }
+
+    // Compute total metrics for a state
+    public static City getStateTotals(Map<String, City> cities) {
+        int totalCases = 0;
+        int totalDeaths = 0;
+        int totalRecovered = 0;
+        int totalHospitalized = 0;
+
+        for (City city : cities.values()) {
+            totalCases += city.getCases();
+            totalDeaths += city.getDeaths();
+            totalRecovered += city.getRecovered();
+            totalHospitalized += city.getHospitalized();
+        }
+
+        return new City("ALL_CITIES", "STATE_TOTAL", totalCases, totalDeaths, totalRecovered, totalHospitalized);
     }
 
     public static void main(String[] args) {
